@@ -114,7 +114,7 @@ def get_magn(url, name):
 def insertDB():
     result = []
     try:
-        conn = pymssql.connect(host='127.0.0.1', user='sa', password='873196023', database='movie', charset='utf8')
+        conn = pymssql.connect(host='127.0.0.1', user='sa', password='******', database='movie', charset='utf8')
     except Exception as err:
         print('数据库链接错误：' + str(err))
         return
