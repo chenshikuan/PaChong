@@ -77,12 +77,17 @@ def get_url(web_url):
                 threading.TIMEOUT_MAX = 30
                 t = threading.Thread(target=get_magn, args=(web_url+h.attrs['href'], name))
                 t.start()
-                while threading.active_count() > 5:
+                while threading.active_count() > 15:
                     #print('the numbers of current thread is ' + str(threading.active_count()))
                     time.sleep(1)
 
     while threading.active_count() > 1:
         time.sleep(1)
+
+
+infoDic = {}
+lock = threading.Lock()
+
 
 def get_magn(url, name):
 
@@ -97,7 +102,9 @@ def get_magn(url, name):
         SoupTbody = BeautifulSoup(driver.page_source, 'lxml').find('div', class_='co_content8')
         child = SoupTbody.find('a')
         magn_url = child.attrs['href']
+        lock.acquire()
         infoDic[name] = magn_url
+        lock.release()
         logger.info('movieName:'+name+'--movieMagn:'+magn_url)
         driver.quit()
     except Exception as err:
@@ -106,12 +113,16 @@ def get_magn(url, name):
 
 def insertDB():
     result = []
+    try:
+        conn = pymssql.connect(host='127.0.0.1', user='sa', password='873196023', database='movie', charset='utf8')
+    except Exception as err:
+        print('数据库链接错误：' + str(err))
+        return
     for key in infoDic:
             u=(key,infoDic[key])
             result.append(u)
     sql = 'insert into T_movie(movieName,movieURL) values(%s,%s)'
     try:
-        conn = pymssql.connect(host='127.0.0.1', user='sa', password='873196023', database='movie', charset='utf8')
         cursor = conn.cursor()
         cursor.executemany(sql, result)
         conn.commit()
@@ -125,9 +136,9 @@ def insertDB():
 
 
 
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
+#headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
 web_url = 'http://www.dytt8.net'  #要访问的网页地址
-infoDic={}
+
 logger = Logger('log.txt', 1, 'kk').getlog()
 get_url(web_url)
-
+insertDB()
