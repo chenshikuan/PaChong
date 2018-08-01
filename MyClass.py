@@ -60,10 +60,22 @@ class MySql(object):
         except Exception as err:
             raise (NameError,'连接数据库失败')
         return cursor
+
     def insertdata(self, sqlstr, res):
         cur = self.__GetCursor()
         try:
-            cur.executemany(sql, res)
+            cur.executemany(sqlstr, res)
+            self.conn.commit()
+        except Exception as err:
+            self.conn.rollback()
+            raise (NameError, '插入数据失败：'+str(err))
+        finally:
+            self.conn.close()
+
+    def insertdata(self, sqlstr):
+        cur = self.__GetCursor()
+        try:
+            cur.execute(sqlstr)
             self.conn.commit()
         except Exception as err:
             self.conn.rollback()
@@ -92,3 +104,7 @@ class MySql(object):
         self.conn.close()
 
 
+
+
+# mysql = MySql('127.0.0.1', 'sa', '873196023', 'movie')
+# mysql.insertdata("insert into T_Url(Url) values('qwe')")
