@@ -106,5 +106,5 @@ class MySql(object):
 
 
 
-# mysql = MySql('127.0.0.1', 'sa', '873196023', 'movie')
+# mysql = MySql('127.0.0.1', 'sa', '', 'movie')
 # mysql.insertdata("insert into T_Url(Url) values('qwe')")

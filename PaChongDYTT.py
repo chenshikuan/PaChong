@@ -23,7 +23,7 @@ def getpage(url):
     return driver.page_source
     #print(driver.page_source)
 def get_type_url():
-    mysql = MySql('127.0.0.1', 'sa', '873196023', 'movie')
+    mysql = MySql('127.0.0.1', 'sa', '', 'movie')
     response = urllib3.urlopen("http://www.dytt8.net/")
     page_source=response.read()
     if page_source=='error':
